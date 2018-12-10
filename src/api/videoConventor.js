@@ -17,7 +17,7 @@ const videoConventor = {
             .on('error', function(err) {
                 console.log(chalk.redBright('ERROR: '), ('Conversion error'));
             })
-            .saveToFile(`/home/valentin/Documents/videomp3/converts/${mp3Name}.mp3`);
+            .saveToFile(`./converts/${mp3Name}.mp3`);
     }
 };
 

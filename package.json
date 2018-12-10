@@ -1,9 +1,10 @@
 {
-  "name": "unvideo",
+  "name": "ytmp3",
+  "preferGlobal": true,
   "version": "1.0.0",
-  "main": "src/index.mjs",
+  "main": "./index.js",
   "bin": {
-    "convert-yt": "./src/index.mjs"
+    "ytmp3": "./index.js"
   },
   "scripts": {
     "start": "nodemon --exec babel-node --presets env,stage-2 src/index.mjs",

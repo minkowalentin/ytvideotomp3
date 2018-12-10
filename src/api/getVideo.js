@@ -25,7 +25,7 @@ async function processVideo(videoLink) {
 
   if (info !== undefined) {
     title = info.title.replace(/[/]/g, '');
-    if (!fs.existsSync(`/home/valentin/Documents/videomp3/converts/${title}.mp3`)) {
+    if (!fs.existsSync(`./converts/${title}.mp3`)) {
       console.log(chalk.green('Downloading: '), chalk.yellow(title));
       try {
         await getVideo(title, videoLink);
@@ -41,15 +41,15 @@ async function processVideo(videoLink) {
 
 function getVideo(title, videoLink) {
   // if directory dosen't exist, create it
-  if (!fs.existsSync('/home/valentin/Documents/videomp3/converts/')) {
-    fs.mkdirSync("/home/valentin/Documents/videomp3/converts/");
+  if (!fs.existsSync('./converts/')) {
+    fs.mkdirSync("./converts/");
   }
 
   return new Promise((resolve, reject) => {
     ytdl(videoLink, { filter: (format) => format.container === 'mp4' })
-      .pipe(fs.createWriteStream(`/home/valentin/Documents/videomp3/converts/${title}.mp4`))
+      .pipe(fs.createWriteStream(`./converts/${title}.mp4`))
       .on('finish', function () {
-        videoConventor.convertVideo(`/home/valentin/Documents/videomp3/converts/${title}.mp4`, title);
+        videoConventor.convertVideo(`./converts/${title}.mp4`, title);
         resolve();
       })
       .on('error', function (err) {
