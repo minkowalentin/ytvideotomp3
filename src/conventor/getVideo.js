@@ -14,10 +14,11 @@ async function getVideoInfo(videoLink) {
   })
 }
 
-async function processVideo(videoLink) {
+async function processVideo(videoLink, ...metadata) {
   let info;
   let title;
   try {
+    // Get information about the video.
     info = await getVideoInfo(videoLink);
   } catch (error) {
     console.log(chalk.redBright('ERROR: '), ('Fetching title failed'));
@@ -25,10 +26,21 @@ async function processVideo(videoLink) {
 
   if (info !== undefined) {
     title = info.title.replace(/[/]/g, '');
+
+    // set the tags according to passed metadata
+    if (metadata.length > 0) {
+      tags = { title:title,...metadata[0]}
+    } else {
+      tags = {
+        title: title
+      }
+    }
+
     if (!fs.existsSync(`./converts/${title}.mp3`)) {
       console.log(chalk.green('Downloading: '), chalk.yellow(title));
       try {
-        await getVideo(title, videoLink);
+        
+        await getVideo(title, videoLink, tags);
       } catch (error) {
         console.log(chalk.redBright('ERROR: '), ('Downloading video failed'));
       }
@@ -39,7 +51,7 @@ async function processVideo(videoLink) {
   }
 }
 
-function getVideo(title, videoLink) {
+function getVideo(title, videoLink, tags) {
   // if directory dosen't exist, create it
   if (!fs.existsSync('./converts/')) {
     fs.mkdirSync("./converts/");
@@ -49,7 +61,7 @@ function getVideo(title, videoLink) {
     ytdl(videoLink, { filter: (format) => format.container === 'mp4' })
       .pipe(fs.createWriteStream(`./converts/${title}.mp4`))
       .on('finish', function () {
-        videoConventor.convertVideo(`./converts/${title}.mp4`, title);
+        videoConventor.convertVideo(`./converts/${title}.mp4`, title, tags);
         resolve();
       })
       .on('error', function (err) {
@@ -57,6 +69,7 @@ function getVideo(title, videoLink) {
       });
   })
 }
+
 
 module.exports = {
   getVideo,

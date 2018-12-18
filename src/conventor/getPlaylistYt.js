@@ -4,9 +4,30 @@ const apiKey = process.env.YT_API_KEY;
 const maxResults = 50;
 const ytLink = 'https://www.youtube.com/watch?v=';
 const chalk = require('chalk');
+const service = google.youtube('v3');
+
+function getPlaylistName(playlistId) {
+
+  const options = {
+    part: 'snippet',
+    key: apiKey,
+    id: playlistId
+  }
+  return new Promise((resolve, reject) => {
+    service.playlists.list(options, function (err, response) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(response.data.items[0].snippet.title);
+      }
+    })
+  }).catch(error => {
+    console.log(chalk.red(error))
+  });
+
+}
 
 function playlistItemsListByPlaylistId(options) {
-  var service = google.youtube('v3');
   return new Promise((resolve, reject) => {
     service.playlistItems.list(options, function (err, response) {
       if (err) {
@@ -16,7 +37,7 @@ function playlistItemsListByPlaylistId(options) {
       }
     })
   }).catch(error => {
-    console.log(chalk.red(error.errors[0].message))
+    console.log(chalk.red(error))
   });
 }
 
@@ -33,7 +54,7 @@ async function getvideosFromPlaylist(options, playlistId) {
     })
   }
   catch (error) {
-    console.log(chalk.redBright('ERROR: '), ('Fetching videos from playlist'));
+    console.log(chalk.redBright('ERROR: '), ('Fetching videos from playlist'), error);
   }
 
   if (nextPage) {
@@ -49,7 +70,7 @@ async function getvideosFromPlaylist(options, playlistId) {
         allResults.push(getVideosId(response.data.items));
         nextPage = response.data.nextPageToken;
       }).catch(error => {
-        console.log(chalk.redBright('ERROR: '), ('Fetching videos from playlist'));
+        console.log(chalk.redBright('ERROR: '), ('Fetching playlist title'),error);
       })
     }
     return flattenArr(allResults);
@@ -59,27 +80,41 @@ async function getvideosFromPlaylist(options, playlistId) {
   }
 }
 
+
 async function loadVideos(playlistId) {
+
   const options = {
     part: 'snippet',
     key: apiKey,
     maxResults: maxResults,
     playlistId: playlistId
   }
+
   console.log('Fetching video links from playlist...');
+
   let videoLinks;
+  let playlistName;
+
   try {
+    playlistName = await getPlaylistName(playlistId);
     videoLinks = await getvideosFromPlaylist(options, playlistId);
   } catch (error) {
-    console.log(chalk.redBright('ERROR: '), ('Fetching videos from playlist'));
+    console.log(chalk.redBright('ERROR: '), ('Fetching videos from playlist'),error);
+
   }
 
   if (videoLinks !== undefined && videoLinks.length > 0) {
-    console.log(`${videoLinks.length} video links fetched`);
-    console.log(`Downloading videos...`);
 
+    const metadata =  {
+      album: playlistName
+  }
+
+    // form tags
+    console.log(`${videoLinks.length} video links fetched`);
+    console.log(`Downloading videos from ${playlistName}...`);
     for (let i = 0; i < videoLinks.length; i++) {
-      getVideo.processVideo(ytLink + videoLinks[i]);
+      const link = ytLink + videoLinks[i];
+      getVideo.processVideo(link, metadata);
     }
   } 
 }
@@ -96,5 +131,6 @@ function flattenArr(arr) {
   const flat = [].concat(...arr);
   return flat.some(Array.isArray) ? flatten(flat) : flat;
 }
+
 
 module.exports = {loadVideos};

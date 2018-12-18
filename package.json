@@ -1,14 +1,15 @@
 {
-  "name": "ytmp3",
+  "name": "unvideo",
   "preferGlobal": true,
   "version": "1.0.0",
-  "main": "./index.js",
-  "bin": {
-    "ytmp3": "./index.js"
-  },
+  "main": "./src/index.js",
+  "bin": "./src/index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node --presets env,stage-2 src/index.mjs",
-    "build": "node --experimental-modules ./src/index.mjs"
+    "start": "nodemon --exec babel-node --presets env,stage-2 ./src/index.js",
+    "build": "node --experimental-modules ./src/index.js"
+  },
+  "pkg": {
+    "assets": "node_modules/figlet/fonts/Cybermedium.flf"
   },
   "license": "MIT",
   "dependencies": {
@@ -16,10 +17,14 @@
     "commander": "^2.19.0",
     "dotenv": "^6.1.0",
     "fidget": "^0.4.9",
+    "figlet": "^1.2.1",
     "fluent-ffmpeg": "^2.1.2",
     "google-auth-library": "^2.0.1",
     "googleapis": "^35.0.0",
     "inquirer": "^3.3.0",
+    "jquery": "^3.3.1",
+    "node-id3": "^0.1.7",
+    "pkg": "^4.3.5",
     "youtube-playlist": "^1.0.2",
     "ytdl-core": "^0.28.0"
   },
