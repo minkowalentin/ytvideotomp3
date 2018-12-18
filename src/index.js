@@ -1,34 +1,55 @@
 #!/usr/bin/env node
+
 require('dotenv').config();
-const program = require('commander');
+// const program = require('commander');
 const chalk = require('chalk');
-const getVideo = require('../src/api/getVideo');
-const downloadPlaylist = require('../src/api/getPlaylistYt');
+const getVideo = require('../src/conventor/getVideo');
+const downloadPlaylist = require('../src/conventor/getPlaylistYt');
 const log = console.log;
+const inquirerApp = require('../src/inquirer/main');
+const figlet = require('figlet');
 
-//TO DO:
-const inquirer = require('inquirer');
-const figlet = require('fidget');
+log(
+  ('\n'),
+  figlet.textSync('Unvideo', {
+  font: 'Cybermedium',
+  horizontalLayout: 'default',
+  verticalLayout: 'default'
+}), ('v0.01'),('\n'));
 
-program
-  .version('1.0.0', '-v, --version')
-  .usage('[OPTIONS]...')
-  .option('-l, --link <link>', 'The link to a video or playlist')
-  .option('-p, --playlist <playlist>', 'The provided link is for a playlist')
-  .option('-d --directory <directory>', 'Set a custom directory for converted files')
-  .parse(process.argv);
+// figlet.fonts(function(err, fonts) {
+//   if (err) {
+//       console.log('something went wrong...');
+//       console.dir(err);figlet.fonts(function(err, fonts) {
+//     if (err) {
+//         console.log('something went wrong...');
+//         console.dir(err);
+//         return;
+//     }
+//     console.dir(fonts);
+// });
+//       return;
+//   }
+//   console.dir(fonts);
+// });
 
-  if (!program.link && !program.playlist) {
-    log(chalk.redBright('Please provide a link.'))
+inquirerApp.askQuestions().then((response) => {
+  if (response.changeDwLocation) {
+    // TO DO
+    //Add functionality to change location 
   }
-  else {
-    if (program.playlist) {
-      downloadPlaylist.loadVideos(program.playlist)
-    }
 
-    if (program.link) {
-      getVideo.processVideo(program.link);
-    }
+  switch (response.type) {
+    case 'video':
+      getVideo.processVideo(response.link);
+      break;
+
+    case 'playlist':
+      downloadPlaylist.loadVideos(response.code);
+      break;
+
+    default:
+      log(chalk.red("Invalid value!"));
+      break;
   }
-
-
+});

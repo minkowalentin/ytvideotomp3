@@ -2,3 +2,4 @@
 config
 converts
 node_modules
+bin
